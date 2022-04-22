@@ -1,6 +1,7 @@
 /***** START - Propensity Test Phase II will remove commented out code by 6/1/22 *****/
 try {
-    var gciData = window.gciData;
+    var gciUserMeta = window.gciAnalytics && window.gciAnalytics.user && window.gciAnalytics.user.meta,
+    	gciUserObject = window.gciAnalytics && window.gciAnalytics.user && window.gciAnalytics.user.response;
     var isJson = function(str) {
 	try {
 	    JSON.parse(str);
@@ -23,11 +24,9 @@ try {
 		var propTestData = location.href.split('propTestData=')[1];
 		propTestData = propTestData.split('{')[1].split('}')[0].split(',');
 		var testVals = {};
-
 		propTestData.forEach(function(param){
 			testVals[param.split(':')[0]] = param.split(':')[1];
 		});
-
 		if(testVals.testCell && testVals.userType && testVals.pSubD && testVals.pSubMW) {
 			gciData = [{}];
 			gciData[0]['page-ab-slot'] = testVals.testCell;
@@ -36,28 +35,28 @@ try {
 		} else {
 			console.log('Adjust formatting of &propTextData. For example &propTestData={testCell:20,userType:subscriber,pSubD:1,pSubMW:null}');
 		}
-
 	}*/
     /*article plus addition*/
     if (isArticlePlus) {
 	TRC._shouldArticlePlus = true;
     }
 
-    if (isPropensityP2Placement && gciData && gciData[0]) {
+    if (isPropensityP2Placement && gciUserMeta && gciUserObject) {
 	TRC._shouldRenderSubTags = true;
-	TRC._userType = gciData[0]['user-type'] && gciData[0]['user-type'].toLowerCase();
+	TRC._userType = gciUserMeta.market_relationship && gciUserObject.meta.market_relationship.toLowerCase();
 
 	/*	var testCell = gciData[0]["page-ab-slot"];
 		var isControlTestCell = ['17','18'].indexOf(testCell) > -1;
 		var isPropensityTestCell = ['19','20'].indexOf(testCell) > -1;*/
 
 	var pSub = 'null';
-	var pSubJson = gciData[0]['user-insights'] && isJson(gciData[0]['user-insights']);
 
-	if (pSubJson && req.uip && req.uip.indexOf('Mobile') > -1) {
-	    pSub = JSON.parse(gciData[0]["user-insights"]).pSubMW;
-	} else if (pSubJson) {
-	    pSub = JSON.parse(gciData[0]["user-insights"]).pSubD;
+	if (gciUserObject.insights) {
+		if (req.uip && req.uip.indexOf('Mobile') > -1) {
+		    pSub = gciUserObject.insights.pSubMW;
+		} else if (pSubJson) {
+		    pSub = gciUserObject.insights.pSubD;
+		}		
 	}
 
 	/*var isLowPsub = ['1','2','3'].indexOf(pSub) > -1;
@@ -110,19 +109,12 @@ if (typeof mode == 'string' && mode == 'thumbnails-inject-sports' || mode == 'th
 /***** Start -  Adding Read More Mode *****/
 try {
 
-    if (TRC.publisherId !== 'gannettdigital-usatodaysportsplus' || 'gannettdigital-heraldtribune' ||
-	'gannettcompany-jsonline' || 'gannettcompany-indystar' || 'gannettdigital-theoklahoman' || 'gannettcompany-vcstar' || 'gannettcompany-lansingstatejournal' || 'gannettdigital-fayobserver' || 'gannettdigital-rrstar' || 'gannettcompany-battlecreekenquirer' || 'gannettcompany-redding' || 'gannettdigital-cjonline' || 'gannettdigital-newsherald') {
-	if (gciData !== undefined && gciData[0] !== undefined && gciData && gciData[0]) {
-	    if (gciData[0]['user-type'] !== undefined && gciData[0]['user-type']) {
-		var isAnonymous = gciData[0]['user-type'] === "anonymous";
+    if (TRC.publisherId !== 'gannettdigital-usatodaysportsplus' && gciUserMeta.isAnonymous) {
 		var isReadMore = isAnonymous && req && req.uip && req.uip === 'Mobile Below Article Feed - Feed Redesign';
-		if (isReadMore && req.uim) {
+		if (req && req.uim && req.uip && req.uip === 'Mobile Below Article Feed - Feed Redesign') {
 		    req.uim = req.uim.replace('thumbs-feed-mobile-e', 'thumbs-feed-mobile-rm');
 		}
-	    }
-	}
     }
-
 
 } catch (e) {
     __trcError('Error in Adding Read More Mode : ', e.message);

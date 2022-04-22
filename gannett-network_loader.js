@@ -110,7 +110,6 @@ if (typeof mode == 'string' && mode == 'thumbnails-inject-sports' || mode == 'th
 try {
 
     if (TRC.publisherId !== 'gannettdigital-usatodaysportsplus' && gciUserMeta.isAnonymous) {
-		var isReadMore = isAnonymous && req && req.uip && req.uip === 'Mobile Below Article Feed - Feed Redesign';
 		if (req && req.uim && req.uip && req.uip === 'Mobile Below Article Feed - Feed Redesign') {
 		    req.uim = req.uim.replace('thumbs-feed-mobile-e', 'thumbs-feed-mobile-rm');
 		}
